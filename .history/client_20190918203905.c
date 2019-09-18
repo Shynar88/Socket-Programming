@@ -150,11 +150,10 @@ struct msg *pack_message(char *text) {
     struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
     memset(msg_out, 0, sizeof(struct msg));
 	msg_out->op = htons(operation); //convert short from host to network
-    int text_len = strlen(text) - 1;
-    msg_out->checksum = 0;
+    int text_len = strlen(text);
     // msg_out->checksum = ip_checksum((char *)msg_out, 16 + text_len, 0);
     strncpy(msg_out->keyword, keyword, 4);
-    msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
+    msg_out->length = htonll(text_len + (uint64_t)16);
     strncpy(msg_out->data, text, text_len);
     return msg_out;
 }
@@ -174,11 +173,9 @@ int main(int argc, char *argv[]) {
     memset(stdInput, 0, sizeof(char));
     memset(result, 0, sizeof(char));
     while (fgets(stdInput, (MAX_LEN - 16) * sizeof(char), stdin) != NULL) {
-        struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
-        memset(msg_out, 0, sizeof(struct msg));
-        msg_out = pack_message(stdInput);
+        struct msg *msg_out = pack_message(stdInput);
         //send message
-        // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
+        write(socket_fd, msg_out, strlen(msg_out->data) + 16);
             // if (operation) {
             //     decode(keyword, stdInput, result);
             //     printf("%s", result);

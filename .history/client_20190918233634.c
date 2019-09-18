@@ -174,9 +174,15 @@ int main(int argc, char *argv[]) {
     memset(stdInput, 0, sizeof(char));
     memset(result, 0, sizeof(char));
     while (fgets(stdInput, (MAX_LEN - 16) * sizeof(char), stdin) != NULL) {
+
+        // int l = strlen(stdInput)-1;
+        // printf("last: %d",stdInput[l]);
+
         struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
         memset(msg_out, 0, sizeof(struct msg));
         msg_out = pack_message(stdInput);
+        #include <inttypes.h>
+        printf("%" PRIu64 "\n", ntohll(msg_out->length));
         //send message
         // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
             // if (operation) {

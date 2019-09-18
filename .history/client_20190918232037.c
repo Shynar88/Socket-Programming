@@ -150,7 +150,8 @@ struct msg *pack_message(char *text) {
     struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
     memset(msg_out, 0, sizeof(struct msg));
 	msg_out->op = htons(operation); //convert short from host to network
-    int text_len = strlen(text) - 1;
+    int text_len = strlen(text);
+    printf(text_len);
     msg_out->checksum = 0;
     // msg_out->checksum = ip_checksum((char *)msg_out, 16 + text_len, 0);
     strncpy(msg_out->keyword, keyword, 4);
@@ -177,6 +178,8 @@ int main(int argc, char *argv[]) {
         struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
         memset(msg_out, 0, sizeof(struct msg));
         msg_out = pack_message(stdInput);
+        #include <inttypes.h>
+        printf("%" PRIu64 "\n", ntohll(msg_out->length));
         //send message
         // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
             // if (operation) {

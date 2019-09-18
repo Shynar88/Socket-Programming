@@ -177,6 +177,15 @@ int main(int argc, char *argv[]) {
         struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
         memset(msg_out, 0, sizeof(struct msg));
         msg_out = pack_message(stdInput);
+
+        unsigned char* charPtr=(unsigned char*)msg_out;
+        int i;
+        printf("structure size : %zu bytes\n",sizeof(struct msg));
+        // for(i=0;i<sizeof(struct msg);i++)
+        //     printf("%02x ",charPtr[i]);
+
+        // #include <inttypes.h>
+        // printf("%" PRIu64 "\n", ntohll(msg_out->length));
         //send message
         // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
             // if (operation) {
