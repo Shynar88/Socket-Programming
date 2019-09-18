@@ -149,17 +149,25 @@ void parse_args(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     int socket_fd; 
 
-    // // parsing arguments
-    // parse_args(argc, argv);
+    // parsing arguments
+    parse_args(argc, argv);
 
-    // // setting up socket
-    // socket_fd = setup_socket();
+    // setting up socket
+    socket_fd = setup_socket();
 
-    // // keep getting stdin 
-    // char *stdInput = malloc(MAX_LEN - 16);
-    // while (fgets(stdInput, sizeof(stdInput), stdin) != NULL) {
-    //     }
+    // keep getting stdin 
+    char stdInput[MAX_LEN - 16];
+    char result[MAX_LEN - 16];
+    while (fgets(stdInput, sizeof(stdInput), stdin) != NULL) {
+            if (operation) {
+                decode(keyword, stdInput, result);
+                printf("%s", result);
+            } else {
+                encode(keyword, stdInput, result);
+                printf("%s", result);
+            }
+        }
 
-    // close(socket_fd);
+    close(socket_fd);
     return 0; 
 }
