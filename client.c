@@ -156,9 +156,11 @@ int main(int argc, char *argv[]) {
     socket_fd = setup_socket();
 
     // keep getting stdin 
-    char stdInput[MAX_LEN - 16];
-    char result[MAX_LEN - 16];
-    while (fgets(stdInput, sizeof(stdInput), stdin) != NULL) {
+    char *stdInput = (char*) malloc((MAX_LEN - 16) * sizeof(char)); 
+    char *result = (char*) malloc((MAX_LEN - 16) * sizeof(char));
+    memset(stdInput, 0, sizeof(char));
+    memset(result, 0, sizeof(char));
+    while (fgets(stdInput, (MAX_LEN - 16) * sizeof(char), stdin) != NULL) {
             if (operation) {
                 decode(keyword, stdInput, result);
                 printf("%s", result);
