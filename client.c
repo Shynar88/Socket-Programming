@@ -12,7 +12,7 @@
 #include <netdb.h>
 #include <ctype.h>
 
-int MAX_LEN = 10000000;
+#define MAX_LEN 10000000
 char *host;
 char *port;
 int operation;
@@ -23,7 +23,7 @@ struct msg {
 	uint16_t checksum;
 	char keyword[4];
 	uint64_t length;
-	char data = malloc(MAX_LEN - 16);
+	char data[MAX_LEN - 16];
 };
 
 static int is_char(char c) {
