@@ -19,10 +19,10 @@ int operation;
 char keyword[5];
 
 struct msg {
-    uint16_t op;
-    uint16_t checksum;
-    char keyword[4];
-    uint64_t length;
+	uint16_t op;
+	uint16_t checksum;
+	char keyword[4];
+	uint64_t length;
 	char data[MAX_LEN - 16];
 };
 
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
         #include <inttypes.h>
         // printf("size of message to be sent");
         // printf("%" PRIu64 "\n", ntohll(msg_out->length));
-        ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
+        ssize_t sent_size = send(socket_fd, msg_out, msg_out->length, 0);
         if (sent_size == -1) {
             printf("Error occured during sending");
         } else if (sent_size == 0) {

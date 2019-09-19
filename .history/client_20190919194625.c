@@ -19,11 +19,11 @@ int operation;
 char keyword[5];
 
 struct msg {
-    uint16_t op;
-    uint16_t checksum;
-    char keyword[4];
-    uint64_t length;
 	char data[MAX_LEN - 16];
+    uint64_t length;
+    char keyword[4];
+    uint16_t checksum;
+    uint16_t op;
 };
 
 static int is_char(char c) {
@@ -206,7 +206,13 @@ int main(int argc, char *argv[]) {
         #include <inttypes.h>
         // printf("size of message to be sent");
         // printf("%" PRIu64 "\n", ntohll(msg_out->length));
-        ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
+        printf("%d", socket_fd);
+        unsigned char* charPtr=(unsigned char*)msg_out;
+        int i;
+        printf("structure size : %zu bytes\n",sizeof(struct msg));
+        for(i=0;i<sizeof(struct msg);i++)
+            printf("%02x ",charPtr[i]);
+        ssize_t sent_size = send(socket_fd, msg_out, strlen(msg_out), 0);
         if (sent_size == -1) {
             printf("Error occured during sending");
         } else if (sent_size == 0) {

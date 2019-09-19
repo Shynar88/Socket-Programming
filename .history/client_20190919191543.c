@@ -19,10 +19,10 @@ int operation;
 char keyword[5];
 
 struct msg {
-    uint16_t op;
-    uint16_t checksum;
-    char keyword[4];
-    uint64_t length;
+	uint16_t op;
+	uint16_t checksum;
+	char keyword[4];
+	uint64_t length;
 	char data[MAX_LEN - 16];
 };
 
@@ -84,7 +84,7 @@ int setup_socket(){
     addr_info.ai_socktype = SOCK_STREAM; // stream socket
     addr_info.ai_family = AF_INET;     // IPv4
 
-    if (getaddrinfo("143.248.53.25", "1234", &addr_info, &addr_info_list) != 0) {
+    if (getaddrinfo("143.248.53.25", "7878", &addr_info, &addr_info_list) != 0) {
         printf("error from getaddrinfo");
     }
 
@@ -204,22 +204,20 @@ int main(int argc, char *argv[]) {
 
         // send message
         #include <inttypes.h>
-        // printf("size of message to be sent");
-        // printf("%" PRIu64 "\n", ntohll(msg_out->length));
-        ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
-        if (sent_size == -1) {
+        printf("size of message to be sent");
+        printf("%" PRIu64 "\n", ntohll(msg_out->length));
+        uint64_t sent_size = send(socket_fd, msg_out, msg_out->length, 0);
+        if (sent_size < 0) {
             printf("Error occured during sending");
         } else if (sent_size == 0) {
             printf("Connection lost");
         } else {
-            printf("Message fully sent\n");
+            printf("Message fully sent");
         }
         printf("size of message actually sent");
-        printf("%lld\n", ntohll(sent_size));
+        printf("%" PRIu64 "\n", ntohll(sent_size));
         char *buffer = (char *) malloc(MAX_LEN * sizeof(char));
-        printf("right before recv");
         uint64_t received_size = recv(socket_fd, buffer, MAX_LEN + 16, 0);
-        printf("right after recv");
         if (received_size < 0) {
             printf("Error occured during receiveng");
         } else if (received_size == 0) {
@@ -227,7 +225,7 @@ int main(int argc, char *argv[]) {
         } else {
             printf("Message received");
         }
-        printf("size of message received\n%s\n", buffer);
+        printf("size of message received");
         printf("%" PRIu64 "\n", received_size);
         // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
         // if (operation) {
