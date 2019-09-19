@@ -146,29 +146,62 @@ void parse_args(int argc, char *argv[]) {
     }
 } 
 
-uint16_t get_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 <= length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) ~sum;
-  }
+// uint16_t get_checksum(char* msg_buf, size_t length) {
+//   uint32_t sum = 0x0000;
+//   // Add every 2 byte chunk
+//   for (size_t i = 0; i + 1 <= length; i += 2) {
+//       uint16_t chunk;
+//       memcpy(&chunk, msg_buf + i, 2);
+//       sum += chunk;
+//       if (sum > 0xffff) {
+//           sum += 1;
+//       }
+//   }
+//   // If length is odd, add the left over chunk
+//   if (length % 2 == 0) {
+//       return (uint16_t) ~sum;
+//   } else {
+//       uint16_t chunk = 0;
+//       memcpy(&chunk, msg_buf + length - 1, 1);
+//       sum += chunk;
+//       if (sum > 0xffff) {
+//           sum += 1;
+//       }
+//       return (uint16_t) ~sum;
+//   }
+// };
+
+uint16_t get_checksum(char* vdata, size_t length) {
+    //Initialise the accumulator.
+    uint32_t acc=0x0000;
+
+    // Handle complete 16-bit blocks.
+    for (size_t i=0;i+1<length;i+=2) {
+        uint16_t word;
+        memcpy(&word, vdata+i,2);
+        // #include <inttypes.h>
+        // printf("Adding word to acc");
+        // printf("%" PRIu16 "\n",word);
+        // printf("%" PRIu32 "\n",acc);
+        acc+=word;
+        // printf("Result");
+        // printf("%" PRIu32 "\n",acc);
+        if (acc>0xffff) {
+            acc-=0xffff;
+        }
+    }
+
+    // Handle any partial block at the end of the data.
+    if (length&1) {
+        uint16_t word=0;
+        memcpy(&word,vdata+length-1,1);
+        acc+=word;
+        if (acc>0xffff) {
+            acc-=0xffff;
+        }
+    }
+
+    return (uint16_t)~acc;
 };
 
 struct msg *pack_message(char *text) {

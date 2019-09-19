@@ -146,29 +146,63 @@ void parse_args(int argc, char *argv[]) {
     }
 } 
 
-uint16_t get_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 <= length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) ~sum;
-  }
+// uint16_t get_checksum(char* msg_buf, size_t length) {
+//   uint32_t sum = 0x0000;
+//   // Add every 2 byte chunk
+//   for (size_t i = 0; i + 1 <= length; i += 2) {
+//       uint16_t chunk;
+//       memcpy(&chunk, msg_buf + i, 2);
+//       sum += chunk;
+//       if (sum > 0xffff) {
+//           sum += 1;
+//       }
+//   }
+//   // If length is odd, add the left over chunk
+//   if (length % 2 == 0) {
+//       return (uint16_t) ~sum;
+//   } else {
+//       uint16_t chunk = 0;
+//       memcpy(&chunk, msg_buf + length - 1, 1);
+//       sum += chunk;
+//       if (sum > 0xffff) {
+//           sum += 1;
+//       }
+//       return (uint16_t) ~sum;
+//   }
+// };
+
+uint16_t get_checksum(char* vdata, size_t length) {
+    printf("%d", length);
+    
+    //Initialise the accumulator.
+    uint32_t acc=0x0000;
+
+    // Handle complete 16-bit blocks.
+    for (size_t i=0;i+1<length;i+=2) {
+        uint16_t word;
+        memcpy(&word, vdata+i,2);
+        printf("Adding word to acc");
+        printf("%" PRIu16 "\n",word);
+        printf("%" PRIu32 "\n",acc);
+        acc+=word;
+        printf("Result");
+        printf("%" PRIu32 "\n",acc);
+        if (acc>0xffff) {
+            acc-=0xffff;
+        }
+    }
+
+    // Handle any partial block at the end of the data.
+    if (length&1) {
+        uint16_t word=0;
+        memcpy(&word,vdata+length-1,1);
+        acc+=word;
+        if (acc>0xffff) {
+            acc-=0xffff;
+        }
+    }
+
+    return (uint16_t)~acc;
 };
 
 struct msg *pack_message(char *text) {
@@ -176,10 +210,10 @@ struct msg *pack_message(char *text) {
     memset(msg_out, 0, sizeof(struct msg));
 	msg_out->op = htons(operation); //convert short from host to network
     int text_len = strlen(text) - 1;
+    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
     strncpy(msg_out->keyword, keyword, 4);
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
-    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
     return msg_out;
 }
 
@@ -202,11 +236,11 @@ int main(int argc, char *argv[]) {
         memset(msg_out, 0, sizeof(struct msg));
         msg_out = pack_message(stdInput);
 
-        unsigned char* charPtr=(unsigned char*)msg_out;
-        int i;
-        printf("structure size : %zu bytes\n",sizeof(struct msg));
-        for(i=0;i<sizeof(struct msg);i++)
-            printf("%02x ",charPtr[i]);
+        // unsigned char* charPtr=(unsigned char*)msg_out;
+        // int i;
+        // printf("structure size : %zu bytes\n",sizeof(struct msg));
+        // for(i=0;i<sizeof(struct msg);i++)
+        //     printf("%02x ",charPtr[i]);
 
         // #include <inttypes.h>
         // printf("%" PRIu64 "\n", ntohll(msg_out->length));

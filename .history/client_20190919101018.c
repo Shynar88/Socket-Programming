@@ -153,19 +153,19 @@ uint16_t get_checksum(char* msg_buf, size_t length) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
   }
   // If length is odd, add the left over chunk
   if (length % 2 == 0) {
+      if (sum > 0xffff) {
+          sum += 1;
+      }
       return (uint16_t) ~sum;
   } else {
       uint16_t chunk = 0;
       memcpy(&chunk, msg_buf + length - 1, 1);
       sum += chunk;
       if (sum > 0xffff) {
-          sum -= 0xffff;
+          sum += 1;
       }
       return (uint16_t) ~sum;
   }
@@ -176,10 +176,10 @@ struct msg *pack_message(char *text) {
     memset(msg_out, 0, sizeof(struct msg));
 	msg_out->op = htons(operation); //convert short from host to network
     int text_len = strlen(text) - 1;
+    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
     strncpy(msg_out->keyword, keyword, 4);
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
-    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
     return msg_out;
 }
 
@@ -208,8 +208,8 @@ int main(int argc, char *argv[]) {
         for(i=0;i<sizeof(struct msg);i++)
             printf("%02x ",charPtr[i]);
 
-        // #include <inttypes.h>
-        // printf("%" PRIu64 "\n", ntohll(msg_out->length));
+        #include <inttypes.h>
+        printf("%" PRIu64 "\n", ntohll(msg_out->length));
         //send message
         // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
             // if (operation) {
