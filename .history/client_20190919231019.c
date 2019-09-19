@@ -12,8 +12,8 @@
 #include <netdb.h>
 #include <ctype.h>
 
-#define htonll(x) ((1==htonl(1)) ? (x) : ((uint64_t)htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))
-#define ntohll(x) ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
+// #define htonll(x) ((1==htonl(1)) ? (x) : ((uint64_t)htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))
+// #define ntohll(x) ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
 #define MAX_LEN 10000000
 
 char *host;
@@ -88,7 +88,7 @@ int setup_socket(){
     addr_info.ai_family = AF_INET;     // IPv4
 
     if (getaddrinfo(host, port, &addr_info, &addr_info_list) != 0) {
-        printf("error from getaddrinfo\n");
+        printf("error from getaddrinfo");
     }
 
     //looping through the list
@@ -103,12 +103,12 @@ int setup_socket(){
                 continue;
             } else {
                 if (connect(socket_fd, el->ai_addr, el->ai_addrlen) != -1) {
-                    printf("connected!!\n");
+                    printf("connected!!");
                     break;
                 }
             }
         } else { 
-            printf("not IPv4\n");
+            printf("not IPv4");
         }
         // convert IP from network to presentation:
         inet_ntop(el->ai_family, address, ip, sizeof ip);
@@ -144,7 +144,7 @@ void parse_args(int argc, char *argv[]) {
                 strcpy(keyword, optarg);
                 break;
             default:
-                printf("Error. Check the command line arguments\n");
+                printf("Error. Check the command line arguments");
         }  
     }
 } 
@@ -236,29 +236,36 @@ int main(int argc, char *argv[]) {
         // printf("%" PRIu64 "\n", ntohll(msg_out->length));
         ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
         if (sent_size == -1) {
-            printf("Error occured during sending\n");
+            printf("Error occured during sending");
         } else if (sent_size == 0) {
-            printf("Connection lost\n");
+            printf("Connection lost");
         } else {
             printf("Message sent\n");
         }
         char *buffer = (char *) malloc(MAX_LEN * sizeof(char));
         uint64_t received_size = recv(socket_fd, buffer, MAX_LEN + 16, 0);
         if (received_size < 0) {
-            printf("Error occured during receiveng\n");
+            printf("Error occured during receiveng");
         } else if (received_size == 0) {
-            printf("Connection lost when receiving\n");
+            printf("Connection lost when receiving");
         } else {
-            printf("Message received\n");
+            printf("Message received");
         }
         if (check_checksum(buffer, (int) ntohll(received_size)) != 0xffff) { 
 			printf("incorrect checksum\n");
 		} else {
-            printf("checksum check passed\n");
+            printf("checksum check passed");
         }
         printf("%s\n", buffer + 16);
         memset(stdInput, 0, sizeof(char));
         memset(result, 0, sizeof(char));
+        // if (operation) {
+        //     decode(keyword, stdInput, result);
+        //     printf("%s", result);
+        // } else {
+        //     encode(keyword, stdInput, result);
+        //     printf("%s", result);
+        // }
         }
 
     close(socket_fd);

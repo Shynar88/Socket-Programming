@@ -259,6 +259,13 @@ int main(int argc, char *argv[]) {
         printf("%s\n", buffer + 16);
         memset(stdInput, 0, sizeof(char));
         memset(result, 0, sizeof(char));
+        // if (operation) {
+        //     decode(keyword, stdInput, result);
+        //     printf("%s", result);
+        // } else {
+        //     encode(keyword, stdInput, result);
+        //     printf("%s", result);
+        // }
         }
 
     close(socket_fd);
