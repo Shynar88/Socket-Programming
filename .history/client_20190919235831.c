@@ -207,7 +207,10 @@ struct msg *pack_message(char *text) {
     strncpy(msg_out->keyword, keyword, 4);
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
+    // uint16_t test = ip_checksum((char *) msg_out, text_len + 16);
     msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
+    // printf("my calculation %u\n", (unsigned int) msg_out->checksum);
+    // printf("correct calculation %u\n", (unsigned int) test);
     return msg_out;
 }
 

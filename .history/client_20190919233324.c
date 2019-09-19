@@ -149,10 +149,38 @@ void parse_args(int argc, char *argv[]) {
     }
 } 
 
+uint16_t ip_checksum(char* vdata,size_t length) {
+    
+  //Initialise the accumulator.
+  uint32_t acc=0x0000;
+
+  // Handle complete 16-bit blocks.
+  for (size_t i=0;i+1<length;i+=2) {
+      uint16_t word;
+      memcpy(&word, vdata+i,2);
+      acc+=word;
+      if (acc>0xffff) {
+          acc-=0xffff;
+      }
+  }
+
+  // Handle any partial block at the end of the data.
+  if (length&1) {
+      uint16_t word=0;
+      memcpy(&word,vdata+length-1,1);
+      acc+=word;
+      if (acc>0xffff) {
+          acc-=0xffff;
+      }
+  }
+
+  return (uint16_t)~acc;
+};
+
 uint16_t get_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
   // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 <= length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
@@ -208,6 +236,9 @@ struct msg *pack_message(char *text) {
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
     msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
+    uint16_t test = ip_checksum((char *) msg_out, text_len + 16);
+    printf("my calculation %u\n", (unsigned int) msg_out->checksum);
+    printf("correct calculation %u\n", (unsigned int) test);
     return msg_out;
 }
 
