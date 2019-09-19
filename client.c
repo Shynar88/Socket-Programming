@@ -84,7 +84,7 @@ int setup_socket(){
     addr_info.ai_socktype = SOCK_STREAM; // stream socket
     addr_info.ai_family = AF_INET;     // IPv4
 
-    if (getaddrinfo("143.248.53.25", "1234", &addr_info, &addr_info_list) != 0) {
+    if (getaddrinfo(host, port, &addr_info, &addr_info_list) != 0) {
         printf("error from getaddrinfo");
     }
 
@@ -171,6 +171,31 @@ uint16_t get_checksum(char* msg_buf, size_t length) {
   }
 };
 
+uint16_t check_checksum(char* msg_buf, size_t length) {
+  uint32_t sum = 0x0000;
+  // Add every 2 byte chunk
+  for (size_t i = 0; i + 1 <= length; i += 2) {
+      uint16_t chunk;
+      memcpy(&chunk, msg_buf + i, 2);
+      sum += chunk;
+      if (sum > 0xffff) {
+          sum -= 0xffff;
+      }
+  }
+  // If length is odd, add the left over chunk
+  if (length % 2 == 0) {
+      return (uint16_t) ~sum;
+  } else {
+      uint16_t chunk = 0;
+      memcpy(&chunk, msg_buf + length - 1, 1);
+      sum += chunk;
+      if (sum > 0xffff) {
+          sum -= 0xffff;
+      }
+      return (uint16_t) sum;
+  }
+};
+
 struct msg *pack_message(char *text) {
     struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
     memset(msg_out, 0, sizeof(struct msg));
@@ -212,14 +237,10 @@ int main(int argc, char *argv[]) {
         } else if (sent_size == 0) {
             printf("Connection lost");
         } else {
-            printf("Message fully sent\n");
+            printf("Message sent\n");
         }
-        printf("size of message actually sent");
-        printf("%lld\n", ntohll(sent_size));
         char *buffer = (char *) malloc(MAX_LEN * sizeof(char));
-        printf("right before recv");
         uint64_t received_size = recv(socket_fd, buffer, MAX_LEN + 16, 0);
-        printf("right after recv");
         if (received_size < 0) {
             printf("Error occured during receiveng");
         } else if (received_size == 0) {
@@ -227,9 +248,12 @@ int main(int argc, char *argv[]) {
         } else {
             printf("Message received");
         }
-        printf("size of message received\n%s\n", buffer);
-        printf("%" PRIu64 "\n", received_size);
-        // write(socket_fd, msg_out, strlen(msg_out->data) + 16);
+        if (check_checksum(buffer, (int) ntohll(received_size)) != 0xffff) { 
+			printf("incorrect checksum\n");
+		} else {
+            printf("checksum check passed");
+        }
+        printf("%s\n", buffer + 16);
         // if (operation) {
         //     decode(keyword, stdInput, result);
         //     printf("%s", result);
