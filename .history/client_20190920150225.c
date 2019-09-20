@@ -217,10 +217,10 @@ ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
 	while (msg_length > 0) {
         ssize_t sent_size = send(socket_fd, msg_buf + i, msg_length, 0);
 		if (sent_size == -1) {
-			printf("Error occured during sending.\n");
+			printf("Error in sending.\n");
             continue;
 		} else if (sent_size == 0) {
-			printf("Connection lost.\n");
+			printf("Connection lost");
 		} else {
             size_acc += sent_size;
             msg_length -= sent_size;
@@ -251,24 +251,27 @@ int main(int argc, char *argv[]) {
         msg_out = pack_message(stdInput);
 
         // send message
+        // ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
         ssize_t sent_size = send_all(socket_fd, (char *) msg_out, ntohll(msg_out->length));
+        if (sent_size == -1) {
+            printf("Error occured during sending\n");
+        } else if (sent_size == 0) {
+            printf("Connection lost\n");
+        } else {
+            printf("Message sent\n");
+        }
 
         //receiving message
-        int size_acc = 0;
         char *buffer = (char *) malloc(MAX_LEN * sizeof(char));
-        while (size_acc < ntohll(msg_out->length)) {
-            size_acc += recv(socket_fd, buffer + size_acc, MAX_LEN - size_acc, 0);
-        }
-        if (size_acc == -1) {
+        uint64_t received_size = recv(socket_fd, buffer, MAX_LEN + 16, 0);
+        if (received_size < 0) {
             printf("Error occured during receiveng\n");
-        } else if (size_acc == 0) {
+        } else if (received_size == 0) {
             printf("Connection lost when receiving\n");
         } else {
             printf("Message received\n");
         }
-
-        // checking integrit of message
-        if (check_checksum(buffer, (int) ntohll(size_acc)) != 0xffff) { //length of msg itself might be better
+        if (check_checksum(buffer, (int) ntohll(received_size)) != 0xffff) { 
 			printf("incorrect checksum\n");
 		} else {
             printf("checksum check passed\n");
