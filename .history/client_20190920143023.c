@@ -212,22 +212,23 @@ struct msg *pack_message(char *text) {
 }
 
 ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
-    int i = 0;
+	uint8_t *ptr = msg_buf;
 	ssize_t size_acc = 0;
+
 	while (msg_length > 0) {
-        ssize_t sent_size = send(socket_fd, msg_buf + i, msg_length, 0);
+        ssize_t sent_size = send(socket_fd, ptr, msg_length, 0);
 		if (sent_size == -1) {
 			printf("Error in sending.\n");
             continue;
 		} else if (sent_size == 0) {
 			printf("Connection lost");
-		} else {
-            size_acc += sent_size;
-            msg_length -= sent_size;
-            i += sent_size;
-        }
+		} 
+
+		write_len += sent_size;
+		ptr += sent_size;
+		msg_length -= sent_size;
 	}
-	return size_acc;
+	return write_len;
 }
 
 int main(int argc, char *argv[]) {

@@ -216,6 +216,7 @@ ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
 	ssize_t size_acc = 0;
 	while (msg_length > 0) {
         ssize_t sent_size = send(socket_fd, msg_buf + i, msg_length, 0);
+        printf("===================\n");
 		if (sent_size == -1) {
 			printf("Error in sending.\n");
             continue;
@@ -253,6 +254,9 @@ int main(int argc, char *argv[]) {
         // send message
         // ssize_t sent_size = send(socket_fd, (char *) msg_out, ntohll(msg_out->length), 0);
         ssize_t sent_size = send_all(socket_fd, (char *) msg_out, ntohll(msg_out->length));
+        printf("+++++++++++\n");
+        printf ("%zd\n", sent_size);
+        printf("%" PRIu64 "\n", ntohll(msg_out->length));
         if (sent_size == -1) {
             printf("Error occured during sending\n");
         } else if (sent_size == 0) {

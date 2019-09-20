@@ -211,25 +211,6 @@ struct msg *pack_message(char *text) {
     return msg_out;
 }
 
-ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
-    int i = 0;
-	ssize_t size_acc = 0;
-	while (msg_length > 0) {
-        ssize_t sent_size = send(socket_fd, msg_buf + i, msg_length, 0);
-		if (sent_size == -1) {
-			printf("Error in sending.\n");
-            continue;
-		} else if (sent_size == 0) {
-			printf("Connection lost");
-		} else {
-            size_acc += sent_size;
-            msg_length -= sent_size;
-            i += sent_size;
-        }
-	}
-	return size_acc;
-}
-
 int main(int argc, char *argv[]) {
     int socket_fd; 
 
