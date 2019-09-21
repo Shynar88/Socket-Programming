@@ -140,76 +140,6 @@ int setup_socket(){
     return socket_fd;
 }
 
-uint16_t check_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 <= length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) sum;
-  }
-};
-
-//function for sending whole message
-ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
-    int i = 0;
-	ssize_t size_acc = 0;
-	while (msg_length > 0) {
-        ssize_t sent_size = send(socket_fd, msg_buf + i, msg_length, 0);
-		if (sent_size == -1) {
-			printf("Error occured during sending.\n");
-            continue;
-		} else if (sent_size == 0) {
-			printf("Connection lost.\n");
-		} else {
-            size_acc += sent_size;
-            msg_length -= sent_size;
-            i += sent_size;
-        }
-	}
-	return size_acc;
-}
-
-uint16_t get_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) ~sum;
-  }
-};
-
 int main(int argc, char *argv[]) {
     int socket_fd; 
     int client_socket_fd;
@@ -223,63 +153,18 @@ int main(int argc, char *argv[]) {
     socket_fd = setup_socket();
 
     for(;;) {
-        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, &client_addr_size)) != -1) {
+        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, sizeof(client_addr_size))) != -1) {
             printf("accept successfull!");
         }
         int pid = fork();
         if (!pid) { // in the child    pid == 0
-            close(socket_fd); // no need of listener for children
-
-            //receiving message
-            struct msg *msg_in = (struct msg*) malloc(sizeof(struct msg));
-            memset(msg_in, 0, sizeof(struct msg));
-            int size_received = 0;
-            while ((size_received = recv(client_socket_fd, msg_in, sizeof(struct msg), 0)) > 0) {
-                if (size_received == -1) {
-                    printf("Error occured during receiveng\n");
-                } else if (size_received == 0) {
-                    printf("Connection lost when receiving\n");
-                } else {
-                    printf("Message received\n");
-                }
-
-                // checking integrity of message
-                if (check_checksum((char *) msg_in, (int) ntohll(msg_in->length)) != 0xffff) { 
-                    printf("incorrect checksum\n");
-                } else {
-                    printf("checksum check passed\n");
-                }
-
-                //packing message
-                struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
-                memset(msg_out, 0, sizeof(struct msg));
-                msg_out->op = msg_in->op; 
-                msg_out->length = msg_in->length; 
-                strncpy(msg_out->keyword, msg_in->keyword, 4);
-                if (ntohs(msg_in->op)) {
-                    decode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of decoding %s", msg_out->data);
-                } else {
-                    encode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of encoding %s", msg_out->data);
-                }
-                msg_out->checksum = get_checksum((char *) msg_out, (int) (ntohll(msg_in->length)));
-
-                //send message to client
-                send_all(client_socket_fd, (char *) msg_out, ntohll(msg_out->length));
-
-                //reset variables
-                memset(msg_out, 0, sizeof(struct msg));
-                memset(msg_in, 0, sizeof(struct msg));
-            }
-            close(client_socket_fd);
-            free(msg_in);
+            close(socket_fd); // no need of listener for chils
+            if (send(new_fd, "Hello, world!", 13, 0) == -1)
+                perror("send");
+            close(new_fd);
             exit(0); 
-        } else if (pid == -1) {
-            printf("fork fail");
-            continue;
         } else { // in the parent
-            // wait(NULL); //for reaping zombie children
+            wait(NULL); //for reaping zombie children
             close(client_socket_fd);  // parent doesn't need this
         }
     }

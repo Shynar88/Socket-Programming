@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
             printf("fork fail");
             continue;
         } else { // in the parent
-            // wait(NULL); //for reaping zombie children
+            wait(NULL); //for reaping zombie children
             close(client_socket_fd);  // parent doesn't need this
         }
     }

@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     socket_fd = setup_socket();
 
     for(;;) {
-        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, &client_addr_size)) != -1) {
+        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, sizeof(client_addr_size))) != -1) {
             printf("accept successfull!");
         }
         int pid = fork();
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
             printf("fork fail");
             continue;
         } else { // in the parent
-            // wait(NULL); //for reaping zombie children
+            wait(NULL); //for reaping zombie children
             close(client_socket_fd);  // parent doesn't need this
         }
     }

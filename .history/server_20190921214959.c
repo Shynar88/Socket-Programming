@@ -140,31 +140,6 @@ int setup_socket(){
     return socket_fd;
 }
 
-uint16_t check_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 <= length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) sum;
-  }
-};
-
 //function for sending whole message
 ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
     int i = 0;
@@ -185,31 +160,6 @@ ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
 	return size_acc;
 }
 
-uint16_t get_checksum(char* msg_buf, size_t length) {
-  uint32_t sum = 0x0000;
-  // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
-      uint16_t chunk;
-      memcpy(&chunk, msg_buf + i, 2);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-  }
-  // If length is odd, add the left over chunk
-  if (length % 2 == 0) {
-      return (uint16_t) ~sum;
-  } else {
-      uint16_t chunk = 0;
-      memcpy(&chunk, msg_buf + length - 1, 1);
-      sum += chunk;
-      if (sum > 0xffff) {
-          sum -= 0xffff;
-      }
-      return (uint16_t) ~sum;
-  }
-};
-
 int main(int argc, char *argv[]) {
     int socket_fd; 
     int client_socket_fd;
@@ -223,7 +173,7 @@ int main(int argc, char *argv[]) {
     socket_fd = setup_socket();
 
     for(;;) {
-        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, &client_addr_size)) != -1) {
+        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, sizeof(client_addr_size))) != -1) {
             printf("accept successfull!");
         }
         int pid = fork();
@@ -233,7 +183,6 @@ int main(int argc, char *argv[]) {
             //receiving message
             struct msg *msg_in = (struct msg*) malloc(sizeof(struct msg));
             memset(msg_in, 0, sizeof(struct msg));
-            int size_received = 0;
             while ((size_received = recv(client_socket_fd, msg_in, sizeof(struct msg), 0)) > 0) {
                 if (size_received == -1) {
                     printf("Error occured during receiveng\n");
@@ -256,13 +205,13 @@ int main(int argc, char *argv[]) {
                 msg_out->op = msg_in->op; 
                 msg_out->length = msg_in->length; 
                 strncpy(msg_out->keyword, msg_in->keyword, 4);
-                if (ntohs(msg_in->op)) {
-                    decode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of decoding %s", msg_out->data);
-                } else {
-                    encode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of encoding %s", msg_out->data);
-                }
+                if (ntohs(msg_in->op)) {
+                    decode(msg_in->keyword, msg_in->data, msg_out->data);
+                    printf("result of decoding %s", msg_out->data);
+                } else {
+                    encode(msg_in->keyword, msg_in->data, msg_out->data);
+                    printf("result of encoding %s", msg_out->data);
+                }
                 msg_out->checksum = get_checksum((char *) msg_out, (int) (ntohll(msg_in->length)));
 
                 //send message to client
@@ -272,14 +221,20 @@ int main(int argc, char *argv[]) {
                 memset(msg_out, 0, sizeof(struct msg));
                 memset(msg_in, 0, sizeof(struct msg));
             }
-            close(client_socket_fd);
+
+            //reset msg_in 
             free(msg_in);
+            }
+
+
+            
+            close(client_socket_fd);
             exit(0); 
-        } else if (pid == -1) {
+        } else if (pid == -1){
             printf("fork fail");
             continue;
         } else { // in the parent
-            // wait(NULL); //for reaping zombie children
+            wait(NULL); //for reaping zombie children
             close(client_socket_fd);  // parent doesn't need this
         }
     }

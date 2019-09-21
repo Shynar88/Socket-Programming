@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     socket_fd = setup_socket();
 
     for(;;) {
-        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, &client_addr_size)) != -1) {
+        if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, sizeof(client_addr_size))) != -1) {
             printf("accept successfull!");
         }
         int pid = fork();
@@ -256,12 +256,12 @@ int main(int argc, char *argv[]) {
                 msg_out->op = msg_in->op; 
                 msg_out->length = msg_in->length; 
                 strncpy(msg_out->keyword, msg_in->keyword, 4);
-                if (ntohs(msg_in->op)) {
-                    decode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of decoding %s", msg_out->data);
-                } else {
-                    encode(msg_in->keyword, msg_in->data, msg_out->data);
-                    printf("result of encoding %s", msg_out->data);
+                if (ntohs(msg_in->op)) {
+                    decode(msg_in->keyword, msg_in->data, msg_out->data);
+                    printf("result of decoding %s", msg_out->data);
+                } else {
+                    encode(msg_in->keyword, msg_in->data, msg_out->data);
+                    printf("result of encoding %s", msg_out->data);
                 }
                 msg_out->checksum = get_checksum((char *) msg_out, (int) (ntohll(msg_in->length)));
 
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
             printf("fork fail");
             continue;
         } else { // in the parent
-            // wait(NULL); //for reaping zombie children
+            wait(NULL); //for reaping zombie children
             close(client_socket_fd);  // parent doesn't need this
         }
     }
