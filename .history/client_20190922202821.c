@@ -12,8 +12,8 @@
 #include <netdb.h>
 #include <ctype.h>
 
-#define htonll(x) ((1==htonl(1)) ? (x) : ((uint64_t)htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))
-#define ntohll(x) ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
+// #define htonll(x) ((1==htonl(1)) ? (x) : ((uint64_t)htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))
+// #define ntohll(x) ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
 #define MAX_LEN 10000000
 
 char *host;
@@ -105,9 +105,8 @@ void parse_args(int argc, char *argv[]) {
 
 uint16_t get_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
-  size_t i;
   // Add every 2 byte chunk
-  for (i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 < length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
@@ -131,9 +130,8 @@ uint16_t get_checksum(char* msg_buf, size_t length) {
 
 uint16_t check_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
-  size_t i;
   // Add every 2 byte chunk
-  for (i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 < length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
@@ -187,6 +185,7 @@ ssize_t send_all(int socket_fd, char* msg_buf, size_t msg_length) {
 }
 
 int main(int argc, char *argv[]) {
+    printf("MAKEFILEEEEEEE");
     int socket_fd; 
 
     // parsing arguments
