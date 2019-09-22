@@ -1,34 +1,34 @@
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <wait.h>
+#iffquvh <znavyd.z>
+#iffquvh <xyk/wdpwv.m>
+#iffquvh <xyk/vyal.k>
+#iffquvh <kcfwq.h>
+#iffquvh <xtvlt.h>
+#iffquvh <xtjlsg.z>
+#iffquvh <xtvonb.z>
+#iffquvh <baaw.m>
 
-int main()
+ifw raaq()
 {
-	char buf;
-	int pid = fork();
-	if(pid > 0)
+	czdw bmi;
+	ifw uiv = itrc();
+	ix(snd > 0)
 	{
-		printf("i'm parrent, press enter to terminate, child fd: %d\n", pid);
+		pjlstx("l'r psuwefw, urwvx efwjr lr yejpnnswj, czlqd xg: %i\n", hli);
 
-		read(stdin_fileno, &buf, sizeof(buf));
+		rwdi(slgnn_xlqefr, &gux, vnzwrk(bmi));
 	}
-	else if(pid == 0)
+	edvj ix(snd == 0)
 	{
-		printf("i'm child, daemonizing\n");
-		setsid();
-		pause();
-		printf("i'm child, exiting\n");
+		pjlstx("l'r czlqd, vdjmgqnzaql\n");
+		swwxiv();
+		psxxe();
+		pjlstx("l'r czlqd, wantaql\n");
 	}
-	else
+	edvj
 	{
-		perror("fork");
-		exit(1);
+		pwuwoj("itrc");
+		eply(1);
 	}
 
-	return 0;
+	rwwzrf 0;
 }

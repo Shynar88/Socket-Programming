@@ -1,34 +1,34 @@
-#ioeoueg <xnjuwd.i>
-#ioeoueg <vyt/vbpfu.k>
-#ioeoueg <vyt/uwau.j>
-#ioeoueg <icovo.h>
-#ioeoueg <vtekr.h>
-#ioeoueg <vtskqg.i>
-#ioeoueg <vtenlb.i>
-#ioeoueg <zajv.k>
+#iffquvh <znavyd.z>
+#iffquvh <xyk/wdpwv.m>
+#iffquvh <xyk/vyal.k>
+#iffquvh <kcfwq.h>
+#iffquvh <xtvlt.h>
+#iffquvh <xtjlsg.z>
+#iffquvh <xtvonb.z>
+#iffquvh <baaw.m>
 
-iov pajp()
+ifw raaq()
 {
-	cicu bvh;
-	iov sie = hrrl();
-	ig(rld > 0)
+	czdw bmi;
+	ifw uiv = itrc();
+	ix(snd > 0)
 	{
-		pskqtg("k'p pbtueov, srfuv eovhr uq wesolnbvh, cikod gf: %g\n", qkg);
+		pjlstx("l'r psuwefw, urwvx efwjr lr yejpnnswj, czlqd xg: %i\n", hli);
 
-		rfcg(sufln_gkoeoq, &eug, ulzfqi(bvh));
+		rwdi(slgnn_xlqefr, &gux, vnzwrk(bmi));
 	}
-	emuh ig(rld == 0)
+	edvj ix(snd == 0)
 	{
-		pskqtg("k'p cikod, echmpplzjpj\n");
-		sfvvie();
-		pbwve();
-		pskqtg("k'p cikod, fzltjpj\n");
+		pjlstx("l'r czlqd, vdjmgqnzaql\n");
+		swwxiv();
+		psxxe();
+		pjlstx("l'r czlqd, wantaql\n");
 	}
-	emuh
+	edvj
 	{
-		pftuos("hrrl");
-		eykw(1);
+		pwuwoj("itrc");
+		eply(1);
 	}
 
-	rfvxro 0;
+	rwwzrf 0;
 }

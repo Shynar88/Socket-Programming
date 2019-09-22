@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
 
     for(;;) {
         if ((client_socket_fd = accept(socket_fd, (struct sockaddr *) &client_sockaddr, &client_addr_size)) != -1) {
-            printf("accept successfull!");
+            // printf("accept successfull!");
         }
         int pid = fork();
         if (!pid) { // in the child    pid == 0
@@ -265,6 +265,7 @@ int main(int argc, char *argv[]) {
 
                 // checking integrity of message
                 if (check_checksum((char *) msg_in, (int) ntohll(msg_in->length)) != 0xffff) { 
+                    printf("%d", (int) ntohll(msg_in->length));
                     printf("incorrect checksum\n");
                     break;
                 } else {
