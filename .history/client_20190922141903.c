@@ -98,7 +98,7 @@ void parse_args(int argc, char *argv[]) {
                 strcpy(keyword, optarg);
                 break;
             default:
-                printf("Error. Check the command line arguments\n");
+                // printf("Error. Check the command line arguments\n");
         }  
     }
 } 
@@ -157,7 +157,7 @@ struct msg *pack_message(char *text) {
     struct msg *msg_out = (struct msg*) malloc(sizeof(struct msg));
     memset(msg_out, 0, sizeof(struct msg));
 	msg_out->op = htons(operation); //convert short from host to network
-    int text_len = strlen(text);
+    int text_len = strlen(text) - 1;
     strncpy(msg_out->keyword, keyword, 4);
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
         }
 
         //printing payload
-        printf("%s", buffer + 16);
+        printf("%s\n", buffer + 16);
         memset(stdInput, 0, sizeof(char));
         memset(result, 0, sizeof(char));
         }

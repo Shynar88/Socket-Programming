@@ -1,0 +1,34 @@
+#ioeoueg <xnjuwd.i>
+#ioeoueg <vyt/vbpfu.k>
+#ioeoueg <vyt/uwau.j>
+#ioeoueg <icovo.h>
+#ioeoueg <vtekr.h>
+#ioeoueg <vtskqg.i>
+#ioeoueg <vtenlb.i>
+#ioeoueg <zajv.k>
+
+iov pajp()
+{
+	cicu bvh;
+	iov sie = hrrl();
+	ig(rld > 0)
+	{
+		pskqtg("k'p pbtueov, srfuv eovhr uq wesolnbvh, cikod gf: %g\n", qkg);
+
+		rfcg(sufln_gkoeoq, &eug, ulzfqi(bvh));
+	}
+	emuh ig(rld == 0)
+	{
+		pskqtg("k'p cikod, echmpplzjpj\n");
+		sfvvie();
+		pbwve();
+		pskqtg("k'p cikod, fzltjpj\n");
+	}
+	emuh
+	{
+		pftuos("hrrl");
+		eykw(1);
+	}
+
+	rfvxro 0;
+}
