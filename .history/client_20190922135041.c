@@ -131,7 +131,7 @@ uint16_t get_checksum(char* msg_buf, size_t length) {
 uint16_t check_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
   // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 <= length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
@@ -161,7 +161,7 @@ struct msg *pack_message(char *text) {
     strncpy(msg_out->keyword, keyword, 4);
     msg_out->length = htonll(text_len + (uint64_t)16); // 64 bit num in host byte order to network byte
     strncpy(msg_out->data, text, text_len);
-    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16);
+    msg_out->checksum = get_checksum((char *) msg_out, text_len + 16) - 2;
     return msg_out;
 }
 

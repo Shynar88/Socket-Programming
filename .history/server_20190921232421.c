@@ -244,9 +244,8 @@ int main(int argc, char *argv[]) {
                 }
 
                 // checking integrity of message
-                if (check_checksum((char *) msg_in, (int) ntohll(size_received)) != 0xffff) { 
+                if (check_checksum((char *) msg_in, (int) ntohll(msg_in->length)) != 0xffff) { 
                     printf("incorrect checksum\n");
-                    break;
                 } else {
                     printf("checksum check passed\n");
                 }
@@ -281,7 +280,7 @@ int main(int argc, char *argv[]) {
             continue;
         } else { // in the parent
             // wait(NULL); //for reaping zombie children
-            while (waitpid(-1, NULL, WNOHANG) > 0);
+            while(waitpid(-1, NULL, WNOHANG) > 0);
             close(client_socket_fd);  // parent doesn't need this
         }
     }

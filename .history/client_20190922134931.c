@@ -124,14 +124,14 @@ uint16_t get_checksum(char* msg_buf, size_t length) {
       if (sum > 0xffff) {
           sum -= 0xffff;
       }
-      return (uint16_t) ~sum;
+      return (uint16_t) sum;
   }
 };
 
 uint16_t check_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
   // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 <= length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
