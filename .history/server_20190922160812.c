@@ -153,7 +153,7 @@ uint16_t check_checksum(char* msg_buf, size_t length) {
   }
   // If length is odd, add the left over chunk
   if (length % 2 == 0) {
-      return (uint16_t) sum;
+      return (uint16_t) ~sum;
   } else {
       uint16_t chunk = 0;
       memcpy(&chunk, msg_buf + length - 1, 1);

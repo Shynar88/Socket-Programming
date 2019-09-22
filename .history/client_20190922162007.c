@@ -222,9 +222,7 @@ int main(int argc, char *argv[]) {
         }
 
         // checking integrit of message
-        uint64_t chunk;
-        memcpy(&chunk, buffer + 8, 8);
-        if (check_checksum(buffer, (int) ntohll(chunk)) != 0xffff) { //length of msg itself might be better
+        if (check_checksum(buffer, (int) ntohll(buffer)) != 0xffff) { //length of msg itself might be better
 			printf("incorrect checksum\n");
 		} else {
             // printf("checksum check passed\n");

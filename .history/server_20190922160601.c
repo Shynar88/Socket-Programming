@@ -153,7 +153,7 @@ uint16_t check_checksum(char* msg_buf, size_t length) {
   }
   // If length is odd, add the left over chunk
   if (length % 2 == 0) {
-      return (uint16_t) sum;
+      return (uint16_t) ~sum;
   } else {
       uint16_t chunk = 0;
       memcpy(&chunk, msg_buf + length - 1, 1);
@@ -244,7 +244,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 // checking integrity of message
-                if (check_checksum((char *) msg_in, (int) ntohll(msg_in->length)) != 0xffff) { 
+                if (check_checksum((char *) msg_in, (int) ntohll(size_received)) != 0xffff) { 
                     printf("incorrect checksum\n");
                     break;
                 } else {

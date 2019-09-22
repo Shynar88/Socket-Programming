@@ -106,7 +106,7 @@ void parse_args(int argc, char *argv[]) {
 uint16_t get_checksum(char* msg_buf, size_t length) {
   uint32_t sum = 0x0000;
   // Add every 2 byte chunk
-  for (size_t i = 0; i + 1 < length; i += 2) {
+  for (size_t i = 0; i + 1 <= length; i += 2) {
       uint16_t chunk;
       memcpy(&chunk, msg_buf + i, 2);
       sum += chunk;
@@ -222,9 +222,7 @@ int main(int argc, char *argv[]) {
         }
 
         // checking integrit of message
-        uint64_t chunk;
-        memcpy(&chunk, buffer + 8, 8);
-        if (check_checksum(buffer, (int) ntohll(chunk)) != 0xffff) { //length of msg itself might be better
+        if (check_checksum(buffer, (int) ntohll(size_acc)) != 0xffff) { //length of msg itself might be better
 			printf("incorrect checksum\n");
 		} else {
             // printf("checksum check passed\n");
