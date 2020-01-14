@@ -15,4 +15,4 @@ Programs (client and server) can be compiled by calling “make all”
 • Rejects connections from protocol-violating clients
 • Allows User to set port  
 
-More details: 
+More details: [Report](https://github.com/Shynar88/Socket-Programming/blob/master/report.pdf)
